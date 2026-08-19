@@ -1,45 +1,43 @@
 # Learning Management System
 
-A Canvas-style LMS built on .NET 10. Instructors create courses, manage rosters, post
-assignments, and grade submissions. Students enroll, view course modules, and submit work.
+An LMS modeled on Canvas, built with .NET 10. Instructors create courses, manage rosters,
+post assignments, and grade work. Students enroll, read course modules, and submit.
 
-There are two front ends over a shared domain library: a .NET MAUI app that runs on Windows,
-Android, iOS, and Mac Catalyst, and an ASP.NET Core Web API. Both persist to SQLite through
-Entity Framework Core.
+Two front ends sit on a shared domain library. One is a .NET MAUI app that runs on Windows,
+Android, iOS, and Mac Catalyst. The other is an ASP.NET Core Web API. Both store data in
+SQLite through Entity Framework Core.
 
 ## Projects
 
-| Project | What it is |
-|---|---|
-| `CLI.LMS.Core` | Domain models and the service interfaces the UI talks to |
-| `CLI.LMS.MAUI` | Cross-platform desktop and mobile client, 12 pages |
-| `CLI.LMS.Api` | REST API over the same domain, with Swagger UI |
-| `CLI.LMS.Cli` | Console version, the original entry point |
+`CLI.LMS.Core` holds the domain models and the service interfaces the UI depends on.
+`CLI.LMS.MAUI` is the client, 12 pages, on desktop and mobile.
+`CLI.LMS.Api` exposes the same domain over REST and serves Swagger UI.
+`CLI.LMS.Cli` is the original console version.
 
 ## Running it
 
-You need the .NET 10 SDK. For the MAUI app you also need the MAUI workload:
+Requires the .NET 10 SDK. The MAUI app also needs its workload:
 
 ```bash
 dotnet workload install maui
 ```
 
-Run the desktop client:
+Desktop client:
 
 ```bash
 dotnet run --project LMS/CLI.LMS.MAUI/CLI.LMS.MAUI -f net10.0-windows10.0.19041.0
 ```
 
-Run the API:
+API:
 
 ```bash
 dotnet run --project LMS/CLI.LMS.Api
 ```
 
-The API creates its SQLite database on first run and serves Swagger UI at `/swagger`.
-Both apps keep their own database file, so they do not share state.
+The API builds its database on first run and serves Swagger at `/swagger`. Each app keeps
+its own database file, so they do not share state.
 
-## API endpoints
+## API
 
 ```
 GET    /api/courses
@@ -59,35 +57,29 @@ PUT    /api/students/{id}
 DELETE /api/students/{id}
 ```
 
-## How it fits together
+## Notes on the design
 
-Pages never touch the database directly. They depend on interfaces in
-`CLI.LMS.Core/Services` — `ICourseService`, `IAssignmentService`, `ISubmissionService` and
-so on — and `MauiProgram.cs` registers the EF Core implementations at startup. There is a
-second set of implementations backed by an in-memory sample data store, which is what the
-app used before persistence existed. Swapping between them is a change to the DI
-registrations and nothing else.
+Pages never touch the database. They depend on interfaces in `CLI.LMS.Core/Services`, and
+`MauiProgram.cs` registers the Entity Framework implementations at startup. A second set of
+implementations reads from a sample data store held in memory, which is what the app used
+before it had persistence. Switching between them means editing those registrations and
+nothing else.
 
-Some things worth pointing at:
+Rosters import and export as CSV with Id, Name, and Code columns. Import skips anyone
+already enrolled and reports how many it added, so running the same file twice is safe.
 
-**Roster import and export.** Rosters go in and out as CSV with `Id,Name,Code` columns.
-Import skips students already enrolled and returns how many were actually added, so running
-the same file twice does not duplicate anyone.
+The gradebook exports one row per student and one column per assignment, with a total
+percentage and a letter grade. Each course sets its own grade cutoffs instead of sharing a
+fixed scale.
 
-**Gradebook export.** One row per student, one column per assignment, plus a total
-percentage and letter grade. Letter grades come from per-course grade ranges rather than a
-fixed scale, so a course can define its own cutoffs.
+Posting an assignment queues an email for every enrolled student. `EmailComposer` in Core
+builds the text, so both service implementations produce the same message. Mail collects in
+an outbox page rather than going out.
 
-**Assignment email outbox.** Posting an assignment queues a message per enrolled student.
-`EmailComposer` in Core builds the message so the MAUI service and the sample data service
-produce identical output. Messages land in an outbox page instead of being sent.
-
-**Submission locking.** Once a submission is graded it cannot be edited, which closes a hole
-where a student could change their answer after seeing the score.
+A graded submission locks. Students cannot edit or resubmit after seeing a score.
 
 ## Origin
 
-This started from a course skeleton for FSU COP 4870, which provided the solution layout and
-an empty project structure. The application — the domain models, both front ends, the API,
-the EF Core layer, and the features above — is my own work. The skeleton's MIT license is
-retained in `LICENSE`.
+Started from a course skeleton for FSU COP 4870, which supplied the solution layout and
+empty projects. Everything else is mine: the models, both front ends, the API, the data
+layer, and the features above. The skeleton's MIT license is kept in `LICENSE`.
