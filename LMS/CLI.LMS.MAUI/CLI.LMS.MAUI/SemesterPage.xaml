@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.SemesterPage"
+             Title="Manage Semesters">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="16">
+
+        <Label Grid.Row="0" Text="Semesters" Style="{StaticResource PageTitle}" />
+
+        <!-- Add / edit form -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="12">
+            <VerticalStackLayout Spacing="8">
+                <Label x:Name="FormHeader" Text="Add a semester" Style="{StaticResource SectionHeader}" />
+
+                <Label Text="Name" Style="{StaticResource Caption}" />
+                <Entry x:Name="NameEntry" Placeholder="e.g. Fall 2026" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="Start date" Style="{StaticResource Caption}" />
+                        <DatePicker x:Name="StartPicker" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Stop date" Style="{StaticResource Caption}" />
+                        <DatePicker x:Name="EndPicker" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                    <Button x:Name="SaveButton" Text="Add Semester" Style="{StaticResource CompactButton}" Clicked="OnSaveSemesterClicked" />
+                    <Button x:Name="CancelEditButton" Text="Cancel" Style="{StaticResource SecondaryButton}" IsVisible="False" Clicked="OnCancelEditClicked" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Semester list -->
+        <CollectionView Grid.Row="2" x:Name="SemestersList" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="No semesters yet. Add one above."
+                       Style="{StaticResource Caption}"
+                       HorizontalOptions="Center"
+                       Margin="0,24,0,0" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}" Margin="0,4">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                                <Label Style="{StaticResource Caption}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding StartDate, StringFormat='{0:MMM d, yyyy}'}" />
+                                            <Span Text="  to  " />
+                                            <Span Text="{Binding EndDate, StringFormat='{0:MMM d, yyyy}'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" Text="Edit" Style="{StaticResource CompactButton}" Clicked="OnEditSemesterClicked" CommandParameter="{Binding Id}" />
+                            <Button Grid.Column="2" Text="Delete" Clicked="OnDeleteSemesterClicked" CommandParameter="{Binding Id}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DangerButton}">
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Padding" Value="12,6" />
+                                        <Setter Property="MinimumHeightRequest" Value="36" />
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

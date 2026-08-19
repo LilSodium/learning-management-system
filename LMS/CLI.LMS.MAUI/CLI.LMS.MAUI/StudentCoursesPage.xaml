@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.StudentCoursesPage"
+             Title="My courses">
+
+    <Grid Padding="24" RowDefinitions="Auto,*" RowSpacing="12">
+
+        <Label x:Name="WelcomeLabel"
+               Grid.Row="0"
+               Style="{StaticResource PageTitle}" />
+
+        <CollectionView Grid.Row="1"
+                         x:Name="CoursesList"
+                         SelectionMode="Single"
+                         SelectionChanged="OnCourseSelected">
+            <CollectionView.EmptyView>
+                <Label Text="You're not enrolled in any courses yet."
+                       Style="{StaticResource Caption}"
+                       HorizontalOptions="Center"
+                       Margin="0,24,0,0" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}" Margin="0,4">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                            <Label Text="{Binding Term}" Style="{StaticResource Caption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

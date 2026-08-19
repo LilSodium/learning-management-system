@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.TeacherCoursesPage"
+             Title="Manage Courses">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="16">
+
+        <Label Grid.Row="0" Text="Courses" Style="{StaticResource PageTitle}" />
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+            <Button Text="Add Course" Clicked="OnAddCourseClicked" />
+            <Button Text="Manage Students" Style="{StaticResource SecondaryButton}" Clicked="OnManageStudentsClicked" />
+            <Button Text="Semesters" Style="{StaticResource SecondaryButton}" Clicked="OnManageSemestersClicked" />
+            <Button Text="Email Log" Style="{StaticResource SecondaryButton}" Clicked="OnEmailLogClicked" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="2" x:Name="CoursesList" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="No courses yet. Tap 'Add Course' to create one."
+                       Style="{StaticResource Caption}"
+                       HorizontalOptions="Center"
+                       Margin="0,24,0,0" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}" Margin="0,4">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                                <Label Text="{Binding Code}" Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" Text="Grade" Style="{StaticResource CompactButton}" Clicked="OnGradeCourseClicked" CommandParameter="{Binding Id}" />
+                            <Button Grid.Column="2" Text="Edit" Style="{StaticResource CompactButton}" Clicked="OnEditCourseClicked" CommandParameter="{Binding Id}" />
+                            <Button Grid.Column="3" Text="Delete" Clicked="OnDeleteCourseClicked" CommandParameter="{Binding Id}">
+                                <Button.Style>
+                                    <!-- DangerButton + CompactButton via BasedOn -->
+                                    <Style TargetType="Button" BasedOn="{StaticResource DangerButton}">
+                                        <Setter Property="FontSize" Value="13" />
+                                        <Setter Property="Padding" Value="12,6" />
+                                        <Setter Property="MinimumHeightRequest" Value="36" />
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

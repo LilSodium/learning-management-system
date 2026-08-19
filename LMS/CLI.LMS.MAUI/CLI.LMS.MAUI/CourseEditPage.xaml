@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.CourseEditPage"
+             Title="Edit Course">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Compact header buttons, based on the shared CompactButton style. -->
+            <Style x:Key="HeaderButtonStyle" TargetType="Button" BasedOn="{StaticResource CompactButton}">
+                <Setter Property="HorizontalOptions" Value="Start" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*,Auto,*" RowSpacing="12">
+
+        <!-- Course details -->
+        <VerticalStackLayout Grid.Row="0" Spacing="6">
+            <Label Text="Course Name" Style="{StaticResource Caption}" />
+            <Label x:Name="TitleLabel" FontSize="22" FontAttributes="Bold" />
+            <Entry x:Name="TitleEntry" FontSize="22" IsVisible="False" />
+
+            <Label Text="Description" Style="{StaticResource Caption}" Margin="0,6,0,0" />
+            <Label x:Name="DescriptionLabel" FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+            <Editor x:Name="DescriptionEditor" FontSize="14" IsVisible="False" AutoSize="TextChanges" />
+
+            <Label Text="Announcement" Style="{StaticResource Caption}" Margin="0,6,0,0" />
+            <Label x:Name="AnnouncementLabel" FontSize="14" />
+            <Editor x:Name="AnnouncementEditor" FontSize="14" IsVisible="False" AutoSize="TextChanges" />
+
+            <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                <Button x:Name="EditAnnouncementButton" Text="Edit Announcement" Style="{StaticResource HeaderButtonStyle}" Clicked="OnEditAnnouncementClicked" />
+                <Button x:Name="SaveAnnouncementButton" Text="Save Announcement" Style="{StaticResource HeaderButtonStyle}" IsVisible="False" Clicked="OnSaveAnnouncementClicked" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8">
+                <Button x:Name="SaveButton" Text="Save" Style="{StaticResource HeaderButtonStyle}" IsVisible="False" Clicked="OnSaveCourseClicked" />
+                <Button x:Name="CancelButton" Text="Cancel" Style="{StaticResource HeaderButtonStyle}" IsVisible="False" Clicked="OnCancelCreateClicked" />
+            </HorizontalStackLayout>
+
+            <Label x:Name="GradeLabel" FontSize="14" FontAttributes="Bold" Margin="0,4,0,0" />
+        </VerticalStackLayout>
+
+        <!-- Course settings toolbar (grade ranges, assignment import/export, gradebook) -->
+        <VerticalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,0">
+            <Label Text="Course Settings" Style="{StaticResource SectionHeader}" />
+            <FlexLayout Wrap="Wrap" Direction="Row">
+                <Button Text="Grade Ranges" Style="{StaticResource HeaderButtonStyle}" Margin="0,0,8,8" Clicked="OnToggleGradeRangesClicked" />
+                <Button Text="Export Assignments" Style="{StaticResource HeaderButtonStyle}" Margin="0,0,8,8" Clicked="OnExportAssignmentsClicked" />
+                <Button Text="Import Assignments" Style="{StaticResource HeaderButtonStyle}" Margin="0,0,8,8" Clicked="OnImportAssignmentsClicked" />
+                <Button Text="Export Gradebook" Style="{StaticResource HeaderButtonStyle}" Margin="0,0,8,8" Clicked="OnExportGradebookClicked" />
+            </FlexLayout>
+
+            <!-- Letter grade ranges -->
+            <Border x:Name="GradeRangesPanel" Style="{StaticResource Card}" Padding="12" IsVisible="False">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Letter grade ranges" Style="{StaticResource SectionHeader}" />
+                    <Label Text="A percentage earns the highest letter whose minimum it meets."
+                           Style="{StaticResource Caption}" />
+                    <ScrollView x:Name="GradeRangesScroll" MaximumHeightRequest="260" VerticalScrollBarVisibility="Always">
+                        <VerticalStackLayout x:Name="GradeRangesContainer" Spacing="6" />
+                    </ScrollView>
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="Add Range" Style="{StaticResource HeaderButtonStyle}" Clicked="OnAddGradeRangeClicked" />
+                        <Button Text="Reset to Default" Style="{StaticResource HeaderButtonStyle}" Clicked="OnResetGradeRangesClicked" />
+                        <Button Text="Save Ranges" Style="{StaticResource HeaderButtonStyle}" Clicked="OnSaveGradeRangesClicked" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- Modules header -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,6,0,0">
+            <Label Text="Modules" Style="{StaticResource SectionHeader}" VerticalOptions="Center" />
+            <Button Grid.Column="1" Style="{StaticResource HeaderButtonStyle}" Text="Add Section" Clicked="OnAddSectionClicked" HorizontalOptions="End" VerticalOptions="Center" />
+            <Button Grid.Column="2" Style="{StaticResource HeaderButtonStyle}" Text="Refresh" Clicked="OnRefreshModulesClicked" HorizontalOptions="End" VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Modules container -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="12">
+            <ScrollView>
+                <VerticalStackLayout x:Name="SectionsContainer" Spacing="12" />
+            </ScrollView>
+        </Border>
+
+        <!-- Roster header -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,6,0,0">
+            <Label Grid.Column="0" Text="Roster" Style="{StaticResource SectionHeader}" VerticalOptions="Center" />
+            <Button Grid.Column="1" Style="{StaticResource HeaderButtonStyle}" Text="Add Student" Clicked="OnAddStudentClicked" VerticalOptions="Center" />
+            <Button Grid.Column="2" Style="{StaticResource HeaderButtonStyle}" Text="Export CSV" Clicked="OnExportRosterClicked" VerticalOptions="Center" />
+            <Button Grid.Column="3" Style="{StaticResource HeaderButtonStyle}" Text="Import CSV" Clicked="OnImportRosterClicked" VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Roster list -->
+        <Border Grid.Row="5" Style="{StaticResource Card}" Padding="8">
+          <Grid RowDefinitions="Auto,*" RowSpacing="8">
+            <SearchBar Grid.Row="0" x:Name="RosterSearchBar" Placeholder="Search roster by name or code..." TextChanged="OnRosterSearchTextChanged" />
+            <CollectionView Grid.Row="1" x:Name="RosterList" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <Label Text="No students in this course yet."
+                           Style="{StaticResource Caption}"
+                           HorizontalOptions="Center"
+                           Margin="0,16" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="12" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <StackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                <Label Text="{Binding Code}" Style="{StaticResource Caption}" />
+                            </StackLayout>
+                            <Button Grid.Column="1"
+                                    Text="Remove"
+                                    Style="{StaticResource DangerButton}"
+                                    CommandParameter="{Binding Id}"
+                                    Clicked="OnRemoveStudentClicked" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+          </Grid>
+        </Border>
+
+    </Grid>
+
+</ContentPage>

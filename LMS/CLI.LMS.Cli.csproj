@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- This project lives at the repo root next to the Core/MAUI folders.
+		     Disable default globbing and compile only Program.cs so it doesn't
+		     accidentally pull in the other projects' source files. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Program.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="CLI.LMS.Core\CLI.LMS.Core.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.SubmissionsPage"
+             Title="Grade Submissions">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+
+        <Label x:Name="CourseTitleLabel" Grid.Row="0" Style="{StaticResource PageTitle}" />
+
+        <Label Grid.Row="1" Text="Select an assignment to grade:" Style="{StaticResource Caption}" />
+
+        <Picker x:Name="AssignmentPicker" Grid.Row="2" Title="Assignment"
+                SelectedIndexChanged="OnAssignmentPickerChanged" />
+
+        <ScrollView Grid.Row="3">
+            <VerticalStackLayout x:Name="SubmissionsContainer" Spacing="12" />
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

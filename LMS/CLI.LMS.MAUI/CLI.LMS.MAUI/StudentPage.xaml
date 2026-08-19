@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.StudentPage"
+             Title="Select Student">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="8">
+
+        <Label Grid.Row="0"
+               Text="Who's using the app?"
+               Style="{StaticResource PageTitle}" />
+
+        <Label Grid.Row="1"
+               Text="Pick your name to continue."
+               Style="{StaticResource Caption}"
+               Margin="0,0,0,8" />
+
+        <CollectionView Grid.Row="2"
+                        x:Name="StudentsList"
+                        SelectionMode="Single"
+                        SelectionChanged="OnStudentSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}" Margin="0,4">
+                        <Label Text="{Binding Name}" FontSize="16" VerticalOptions="Center" />
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.AssignmentDetailPage"
+             Title="Assignment">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <VerticalStackLayout Spacing="4">
+                <Label x:Name="NameLabel" Style="{StaticResource PageTitle}" />
+                <Label x:Name="DueDateLabel" Style="{StaticResource Caption}" />
+                <Label x:Name="PointsLabel" Style="{StaticResource Caption}" />
+            </VerticalStackLayout>
+
+            <Label x:Name="DescriptionLabel" FontSize="15" />
+
+            <!-- Quiz question (only shown for quiz assignments) -->
+            <Border x:Name="QuestionCard" Style="{StaticResource Card}" IsVisible="False"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource AnnouncementBgLight}, Dark={StaticResource AnnouncementBgDark}}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Quiz question" FontSize="12" FontAttributes="Bold" />
+                    <Label x:Name="QuestionLabel" FontSize="15" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Submission card -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Your submission" Style="{StaticResource SectionHeader}" />
+                    <Label x:Name="StatusLabel" Style="{StaticResource Caption}" />
+
+                    <!-- Shown instead of the editor when the quiz has choices -->
+                    <VerticalStackLayout x:Name="ChoicesContainer" Spacing="6" IsVisible="False" />
+
+                    <Editor x:Name="SubmissionEditor"
+                            Placeholder="Type your answer here..."
+                            HeightRequest="150"
+                            AutoSize="TextChanges" />
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Button x:Name="AttachButton"
+                                Text="Attach File"
+                                Style="{StaticResource SecondaryButton}"
+                                Clicked="OnAttachFileClicked" />
+                        <Label x:Name="AttachmentLabel"
+                               Text="No file attached"
+                               Style="{StaticResource Caption}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <Button x:Name="SubmitButton"
+                            Text="Submit"
+                            Clicked="OnSubmitClicked"
+                            HorizontalOptions="Fill" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Comments -->
+            <Border x:Name="CommentsCard" Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Comments" Style="{StaticResource SectionHeader}" />
+                    <Label x:Name="NoCommentsLabel"
+                           Text="No comments yet. Start the conversation with your instructor below."
+                           Style="{StaticResource Caption}" />
+                    <VerticalStackLayout x:Name="CommentsContainer" Spacing="8" />
+                    <Editor x:Name="CommentEditor"
+                            Placeholder="Write a comment to your instructor..."
+                            AutoSize="TextChanges" />
+                    <Button x:Name="PostCommentButton"
+                            Text="Post Comment"
+                            Style="{StaticResource SecondaryButton}"
+                            Clicked="OnPostCommentClicked"
+                            HorizontalOptions="Start" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

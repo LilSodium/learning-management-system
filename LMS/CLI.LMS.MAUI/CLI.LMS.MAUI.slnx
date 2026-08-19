@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../CLI.LMS.Core/CLI.LMS.Core.csproj" />
+  <Project Path="CLI.LMS.MAUI/CLI.LMS.MAUI.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>

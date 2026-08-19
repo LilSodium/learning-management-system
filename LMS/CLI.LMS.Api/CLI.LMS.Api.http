@@ -1,0 +1,48 @@
+@host = http://localhost:5198
+
+### students
+GET {{host}}/api/students
+Accept: application/json
+
+###
+GET {{host}}/api/students/AA
+Accept: application/json
+
+###
+POST {{host}}/api/students
+Content-Type: application/json
+
+{ "name": "Eve", "code": "EE", "classification": 2 }
+
+###
+PUT {{host}}/api/students/AA
+Content-Type: application/json
+
+{ "name": "Anthony", "code": "AA", "classification": 0 }
+
+###
+DELETE {{host}}/api/students/AA
+
+### courses
+GET {{host}}/api/courses
+Accept: application/json
+
+###
+GET {{host}}/api/courses/22
+Accept: application/json
+
+###
+POST {{host}}/api/courses
+Content-Type: application/json
+
+{ "code": "CS", "name": "Intro CS", "description": "Basics", "term": "Fall 2026" }
+
+### roster
+GET {{host}}/api/courses/23/roster
+Accept: application/json
+
+###
+POST {{host}}/api/courses/23/roster/AA
+
+###
+DELETE {{host}}/api/courses/23/roster/AA

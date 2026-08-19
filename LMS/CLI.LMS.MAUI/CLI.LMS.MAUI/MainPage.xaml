@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CLI.LMS.MAUI.MainPage"
+             Title="LMS">
+
+    <Grid Padding="32" RowDefinitions="*,Auto,*">
+
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="8"
+                             WidthRequest="280"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
+
+            <Label Text="Learning Management System"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center" />
+
+            <Label Text="Continue as"
+                   Style="{StaticResource Caption}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,16" />
+
+            <Button Text="Teacher"
+                    Clicked="OnTeacherClicked"
+                    HeightRequest="56"
+                    FontSize="18" />
+
+            <Button Text="Student"
+                    Clicked="OnStudentClicked"
+                    Style="{StaticResource SecondaryButton}"
+                    HeightRequest="56"
+                    FontSize="18" />
+
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>
