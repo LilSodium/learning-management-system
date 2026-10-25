@@ -82,8 +82,39 @@ public class CoursesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var course = await _db.Courses.FirstOrDefaultAsync(c => c.Id == id);
+        // Same cleanup as the desktop app. Sections and GradeRanges use a
+        // nullable FK, so EF won't cascade them and SQLite rejects the delete
+        // with "FOREIGN KEY constraint failed" unless they go first.
+        var course = await _db.Courses
+            .Include(c => c.Roster)
+            .Include(c => c.GradeRanges)
+            .Include(c => c.Sections).ThenInclude(s => s.Modules).ThenInclude(m => m.Content)
+            .Include(c => c.Sections).ThenInclude(s => s.Assignments)
+            .Include(c => c.Sections).ThenInclude(s => s.AssignmentGroups)
+            .FirstOrDefaultAsync(c => c.Id == id);
         if (course is null) return NotFound();
+
+        // Submissions are keyed by AssignmentId, not by a navigation.
+        var assignmentIds = course.Sections.SelectMany(s => s.Assignments).Select(a => a.Id).ToList();
+        if (assignmentIds.Count > 0)
+            _db.Submissions.RemoveRange(_db.Submissions.Where(s => assignmentIds.Contains(s.AssignmentId)));
+
+        foreach (var section in course.Sections)
+        {
+            foreach (var module in section.Modules)
+                _db.RemoveRange(module.Content);
+
+            _db.Modules.RemoveRange(section.Modules);
+            _db.Assignments.RemoveRange(section.Assignments);
+            _db.RemoveRange(section.AssignmentGroups);
+        }
+
+        _db.Sections.RemoveRange(course.Sections);
+        _db.GradeRanges.RemoveRange(course.GradeRanges);
+
+        // Just unenroll them, the students themselves stay.
+        course.Roster.Clear();
+
         _db.Courses.Remove(course);
         await _db.SaveChangesAsync();
         return NoContent();
