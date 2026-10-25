@@ -1,17 +1,42 @@
+using System.Threading.RateLimiting;
 using CLI.LMS;
 using CLI.LMS.Api.Data;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Own SQLite file so this runs without the desktop app.
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "lms-api.db");
+// Database:Path overrides the location (the container sets it to /app/data).
+var dbPath = builder.Configuration["Database:Path"]
+    ?? Path.Combine(builder.Environment.ContentRootPath, "lms-api.db");
+Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(dbPath))!);
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Hosts like Render terminate TLS at a proxy and pass the real scheme and
+// client IP in X-Forwarded-* headers. The proxy's address isn't fixed, so
+// trust the headers from any source.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+// The public demo is writable, so cap each client at 60 requests a minute.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1) }));
+});
 
 var app = builder.Build();
 
@@ -30,18 +55,28 @@ using (var scope = app.Services.CreateScope())
     db.SaveChanges();
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseForwardedHeaders();
+
+// Swagger UI at /swagger for testing endpoints in the browser. On in
+// Development; the hosted demo turns it on with Swagger__Enabled=true.
+var swaggerEnabled = app.Environment.IsDevelopment()
+    || app.Configuration.GetValue<bool>("Swagger:Enabled");
+if (swaggerEnabled)
 {
     app.MapOpenApi();
-    // Swagger UI at /swagger for testing endpoints in the browser.
-    // Dev only, this should never be live in production.
     app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "CLI.LMS API v1"));
+    app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 }
 
-app.UseHttpsRedirection();
+// The hosting proxy already redirects to HTTPS, so only do it locally.
+if (app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
+
+app.MapGet("/health", () => Results.Ok(new { status = "ok" })).ExcludeFromDescription();
 
 app.MapControllers();
 

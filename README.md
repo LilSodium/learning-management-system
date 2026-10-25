@@ -37,6 +37,17 @@ dotnet run --project LMS/CLI.LMS.Api
 The API builds its database on first run and serves Swagger at `/swagger`. Each app keeps
 its own database file, so they do not share state.
 
+## Hosting
+
+The `Dockerfile` builds just the API, and `render.yaml` deploys it to Render's free tier
+(New > Blueprint, pick this repo). The hosted copy turns Swagger on with
+`Swagger__Enabled=true`, sends `/` to `/swagger`, and answers `/health` for the platform's
+health check. Each client gets 60 requests a minute.
+
+The free tier has no persistent disk, so the database goes back to the sample data
+whenever the service restarts or wakes from sleep. The first request after it has been
+idle takes about a minute.
+
 ## API
 
 ```
