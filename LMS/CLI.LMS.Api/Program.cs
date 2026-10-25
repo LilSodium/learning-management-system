@@ -81,3 +81,6 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).ExcludeFromDescri
 app.MapControllers();
 
 app.Run();
+
+// Lets the test project start the API in memory (WebApplicationFactory<Program>).
+public partial class Program { }

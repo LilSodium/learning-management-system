@@ -1,5 +1,7 @@
 # Learning Management System
 
+[![CI](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml/badge.svg)](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml)
+
 **Live API demo:** https://lms-api-cphl.onrender.com (opens Swagger UI; the first request
 after the service has been idle takes about a minute to wake it)
 
@@ -39,6 +41,19 @@ dotnet run --project LMS/CLI.LMS.Api
 
 The API builds its database on first run and serves Swagger at `/swagger`. Each app keeps
 its own database file, so they do not share state.
+
+## Tests
+
+`CLI.LMS.Api.Tests` runs the API in memory with `WebApplicationFactory` and checks every
+endpoint over HTTP: CRUD for courses and students, roster changes, the error cases (400,
+404, 409), and the hosting setup (health check, Swagger flag, rate limit). Each test gets
+its own SQLite file seeded with the sample data, so tests can't affect each other.
+
+```bash
+dotnet test LMS/CLI.LMS.Api.Tests
+```
+
+GitHub Actions runs them on every push and pull request.
 
 ## Hosting
 

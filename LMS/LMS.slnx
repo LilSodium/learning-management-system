@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="CLI.LMS.Core/CLI.LMS.Core.csproj" />
   <Project Path="CLI.LMS.Cli.csproj" />
+  <Project Path="CLI.LMS.Api.Tests/CLI.LMS.Api.Tests.csproj" />
   <Project Path="CLI.LMS.Api/CLI.LMS.Api.csproj" />
 </Solution>
