@@ -2,113 +2,41 @@
 
 [![CI](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml/badge.svg)](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml)
 
-**Live API demo:** https://lms-api-cphl.onrender.com (opens Swagger UI; the first request
-after the service has been idle takes about a minute to wake it)
+**Live API demo:** https://lms-api-cphl.onrender.com (Swagger UI; takes about a minute to wake up if idle)
 
-An LMS modeled on Canvas, built with .NET 10. Instructors create courses, manage rosters,
-post assignments, and grade work. Students enroll, read course modules, and submit.
+A Canvas-style LMS in .NET 10. Instructors create courses, manage rosters, post assignments,
+and grade work; students enroll, read modules, and submit.
 
-Two front ends sit on a shared domain library. One is a .NET MAUI app that runs on Windows,
-Android, iOS, and Mac Catalyst. The other is an ASP.NET Core Web API. Both store data in
-SQLite through Entity Framework Core.
+- `CLI.LMS.Core`: domain models and service interfaces
+- `CLI.LMS.MAUI`: desktop/mobile client (12 pages)
+- `CLI.LMS.Api`: ASP.NET Core REST API with Swagger
+- `CLI.LMS.Api.Tests`: 33 xUnit integration tests, run by GitHub Actions on every push
 
-## Projects
+Both apps store data in SQLite through Entity Framework Core.
 
-`CLI.LMS.Core` holds the domain models and the service interfaces the UI depends on.
-`CLI.LMS.MAUI` is the client, 12 pages, on desktop and mobile.
-`CLI.LMS.Api` exposes the same domain over REST and serves Swagger UI.
-`CLI.LMS.Cli` is the original console version.
+## Features
+
+- Roster import/export as CSV (re-importing the same file is safe)
+- Gradebook export with per-course letter-grade cutoffs
+- Assignment emails queued to an outbox for every enrolled student
+- Graded submissions lock, so students can't resubmit after seeing a score
+- Pages depend on interfaces, so the app can swap between the EF Core and in-memory data layers
 
 ## Running it
 
-Requires the .NET 10 SDK. The MAUI app also needs its workload:
+Requires the .NET 10 SDK.
 
 ```bash
-dotnet workload install maui
-```
-
-Desktop client:
-
-```bash
+dotnet run --project LMS/CLI.LMS.Api                 # API, Swagger at /swagger
+dotnet test LMS/CLI.LMS.Api.Tests                    # tests
+dotnet workload install maui                         # once, for the desktop client
 dotnet run --project LMS/CLI.LMS.MAUI/CLI.LMS.MAUI -f net10.0-windows10.0.19041.0
 ```
 
-API:
-
-```bash
-dotnet run --project LMS/CLI.LMS.Api
-```
-
-The API builds its database on first run and serves Swagger at `/swagger`. Each app keeps
-its own database file, so they do not share state.
-
-## Tests
-
-`CLI.LMS.Api.Tests` runs the API in memory with `WebApplicationFactory` and checks every
-endpoint over HTTP: CRUD for courses and students, roster changes, the error cases (400,
-404, 409), and the hosting setup (health check, Swagger flag, rate limit). Each test gets
-its own SQLite file seeded with the sample data, so tests can't affect each other.
-
-```bash
-dotnet test LMS/CLI.LMS.Api.Tests
-```
-
-GitHub Actions runs them on every push and pull request.
-
-## Hosting
-
-The `Dockerfile` builds just the API, and `render.yaml` deploys it to Render's free tier
-(New > Blueprint, pick this repo). The hosted copy turns Swagger on with
-`Swagger__Enabled=true`, sends `/` to `/swagger`, and answers `/health` for the platform's
-health check. Each client gets 60 requests a minute.
-
-The free tier has no persistent disk, so the database goes back to the sample data
-whenever the service restarts or wakes from sleep. The first request after it has been
-idle takes about a minute.
-
-## API
-
-```
-GET    /api/courses
-GET    /api/courses/{id}
-POST   /api/courses
-PUT    /api/courses/{id}
-DELETE /api/courses/{id}
-
-GET    /api/courses/{id}/roster
-POST   /api/courses/{id}/roster/{studentId}
-DELETE /api/courses/{id}/roster/{studentId}
-
-GET    /api/students
-GET    /api/students/{id}
-POST   /api/students
-PUT    /api/students/{id}
-DELETE /api/students/{id}
-```
-
-## Notes on the design
-
-Pages never touch the database. They depend on interfaces in `CLI.LMS.Core/Services`, and
-`MauiProgram.cs` registers the Entity Framework implementations at startup. A second set of
-implementations reads from a sample data store held in memory, which is what the app used
-before it had persistence. Switching between them means editing those registrations and
-nothing else.
-
-Rosters import and export as CSV with Id, Name, and Code columns. Import skips anyone
-already enrolled and reports how many it added, so running the same file twice is safe.
-
-The gradebook exports one row per student and one column per assignment, with a total
-percentage and a letter grade. Each course sets its own grade cutoffs instead of sharing a
-fixed scale.
-
-Posting an assignment queues an email for every enrolled student. `EmailComposer` in Core
-builds the text, so both service implementations produce the same message. Mail collects in
-an outbox page rather than going out.
-
-A graded submission locks. Students cannot edit or resubmit after seeing a score.
+The hosted API runs from the `Dockerfile` on Render (`render.yaml`). Its database resets to
+the sample data when the service restarts.
 
 ## Origin
 
-Started from a course skeleton for FSU COP 4870, which supplied the solution layout and
-empty projects. Everything else is mine: the models, both front ends, the API, the data
-layer, and the features above. The skeleton's MIT license is kept in `LICENSE`.
+Started from a course skeleton for FSU COP 4870, which supplied the solution layout and empty
+projects. The skeleton's MIT license is kept in `LICENSE`.
