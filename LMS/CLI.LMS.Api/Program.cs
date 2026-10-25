@@ -65,8 +65,12 @@ if (swaggerEnabled)
 {
     app.MapOpenApi();
     app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "CLI.LMS API v1"));
-    app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 }
+
+// The web client in wwwroot is served at "/". It sits ahead of the rate
+// limiter so loading the page doesn't use up a visitor's API requests.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // The hosting proxy already redirects to HTTPS, so only do it locally.
 if (app.Environment.IsDevelopment())

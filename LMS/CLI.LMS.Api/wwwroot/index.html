@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CLI LMS</title>
+  <meta name="description" content="A Canvas-style learning management system: ASP.NET Core Web API, EF Core and SQLite, with this web client and a .NET MAUI desktop app.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%232D3B45'/%3E%3Cpath d='M9 9v14h14' stroke='white' stroke-width='3.2' fill='none'/%3E%3Ccircle cx='21' cy='11' r='3' fill='%23F4A51C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="mobile-bar">
+    <button class="icon-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="global-nav" aria-label="Open navigation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <span id="mobile-title">CLI LMS</span>
+  </header>
+
+  <nav class="global-nav" id="global-nav" aria-label="Global">
+    <a class="logo" href="#/" aria-label="CLI LMS dashboard">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 9v14h14" class="l"/><circle cx="21" cy="11" r="3" class="d"/></svg>
+    </a>
+    <a href="#/" data-nav="dashboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="9" rx="1"/><rect x="13.5" y="3" width="7.5" height="5" rx="1"/><rect x="3" y="15" width="7.5" height="6" rx="1"/><rect x="13.5" y="11" width="7.5" height="10" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="#/courses" data-nav="courses">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5h6.5A2.5 2.5 0 0 1 13 7v13a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-4.5A2.5 2.5 0 0 0 13 7v13a2 2 0 0 1 2-2h5z"/></svg>
+      <span>Courses</span>
+    </a>
+    <a href="#/students" data-nav="students">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c3 0 5.5 2 5.5 5.3"/></svg>
+      <span>Students</span>
+    </a>
+    <div class="nav-spacer"></div>
+    <a href="/swagger" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+      <span>API docs</span>
+    </a>
+    <a href="https://github.com/LilSodium/learning-management-system" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="5.5" r="2.2"/><circle cx="6" cy="18.5" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.7v8.6M18 10.2c0 4-6 3-11 6.5"/></svg>
+      <span>Source</span>
+    </a>
+  </nav>
+  <div class="nav-scrim" id="nav-scrim" hidden></div>
+
+  <div class="app">
+    <p class="demo-banner" role="note">
+      This is a live demo. Changes are saved to the real API and database, and everything resets to the sample data when the server restarts.
+    </p>
+    <div id="view">
+      <main id="main" tabindex="-1"><p class="loading">Loading…</p></main>
+    </div>
+  </div>
+
+  <dialog id="dialog" aria-labelledby="dialog-title">
+    <form method="dialog" id="dialog-form" novalidate>
+      <header class="dialog-head">
+        <h2 id="dialog-title"></h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+      <div class="dialog-body">
+        <div id="dialog-body"></div>
+        <p class="form-error" id="dialog-error" role="alert"></p>
+      </div>
+      <footer class="dialog-actions">
+        <button type="button" class="btn" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary" id="dialog-submit"></button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="flash" id="flash" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

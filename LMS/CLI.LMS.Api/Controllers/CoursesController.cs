@@ -120,6 +120,30 @@ public class CoursesController : ControllerBase
         return NoContent();
     }
 
+    // GET /api/courses/{id}/coursework
+    // Modules and assignments, read-only, with submission counts.
+    [HttpGet("{id}/coursework")]
+    public async Task<ActionResult<CourseworkDto>> GetCoursework(string id)
+    {
+        var course = await _db.Courses
+            .Include(c => c.Sections).ThenInclude(s => s.Modules).ThenInclude(m => m.Content)
+            .Include(c => c.Sections).ThenInclude(s => s.Assignments).ThenInclude(a => a.Submissions)
+            .AsNoTracking()
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(c => c.Id == id);
+        if (course is null) return NotFound();
+
+        var sections = course.Sections.OrderBy(s => s.SectionNumber).ToList();
+        return Ok(new CourseworkDto
+        {
+            Modules = sections.SelectMany(s => s.Modules).Select(ModuleDto.From).ToList(),
+            Assignments = sections.SelectMany(s => s.Assignments)
+                .OrderBy(a => a.Id)
+                .Select(AssignmentDto.From)
+                .ToList()
+        });
+    }
+
     // GET /api/courses/{id}/roster
     [HttpGet("{id}/roster")]
     public async Task<ActionResult<IEnumerable<StudentDto>>> GetRoster(string id)

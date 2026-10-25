@@ -223,4 +223,43 @@ public class CoursesApiTests
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Coursework_ReturnsModulesAndAssignmentsWithGradeStats()
+    {
+        using var factory = new LmsApiFactory();
+        var client = factory.CreateClient();
+
+        var work = await client.GetFromJsonAsync<CourseworkDto>("/api/courses/COP3330/coursework");
+
+        Assert.NotNull(work);
+        var module = Assert.Single(work.Modules);
+        Assert.Contains(module.Items, i => i.Type == "file" && i.Name == "Lecture1-Classes.pdf");
+        Assert.Equal(3, work.Assignments.Count);
+
+        // Homework 1 has three submissions, all graded: 94, 81, 88.
+        var hw1 = Assert.Single(work.Assignments, a => a.Name.StartsWith("Homework 1"));
+        Assert.Equal(3, hw1.SubmissionCount);
+        Assert.Equal(3, hw1.GradedCount);
+        Assert.Equal(87.7, hw1.AverageGrade);
+
+        // Homework 2 has one ungraded submission.
+        var hw2 = Assert.Single(work.Assignments, a => a.Name.StartsWith("Homework 2"));
+        Assert.Equal(1, hw2.SubmissionCount);
+        Assert.Equal(0, hw2.GradedCount);
+        Assert.Null(hw2.AverageGrade);
+
+        Assert.Contains(work.Assignments, a => a.IsQuiz);
+    }
+
+    [Fact]
+    public async Task Coursework_UnknownCourse_Returns404()
+    {
+        using var factory = new LmsApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/courses/NOPE/coursework");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }

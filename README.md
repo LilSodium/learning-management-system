@@ -2,15 +2,15 @@
 
 [![CI](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml/badge.svg)](https://github.com/LilSodium/learning-management-system/actions/workflows/ci.yml)
 
-**Live API demo:** https://lms-api-cphl.onrender.com (Swagger UI; takes about a minute to wake up if idle)
+**Live demo:** https://lms-api-cphl.onrender.com (the free host sleeps when idle, so the first visit can take about a minute). API documentation is at https://lms-api-cphl.onrender.com/swagger.
 
 A Canvas-style LMS in .NET 10. Instructors create courses, manage rosters, post assignments,
 and grade work; students enroll, read modules, and submit.
 
 - `CLI.LMS.Core`: domain models and service interfaces
 - `CLI.LMS.MAUI`: desktop/mobile client (12 pages)
-- `CLI.LMS.Api`: ASP.NET Core REST API with Swagger
-- `CLI.LMS.Api.Tests`: 33 xUnit integration tests, run by GitHub Actions on every push
+- `CLI.LMS.Api`: ASP.NET Core REST API with Swagger, plus a web client (plain HTML, CSS and JavaScript in `wwwroot`) served at the root
+- `CLI.LMS.Api.Tests`: 38 xUnit integration tests, run by GitHub Actions on every push
 
 Both apps store data in SQLite through Entity Framework Core.
 
@@ -27,7 +27,7 @@ Both apps store data in SQLite through Entity Framework Core.
 Requires the .NET 10 SDK.
 
 ```bash
-dotnet run --project LMS/CLI.LMS.Api                 # API, Swagger at /swagger
+dotnet run --project LMS/CLI.LMS.Api                 # web client at /, Swagger at /swagger
 dotnet test LMS/CLI.LMS.Api.Tests                    # tests
 dotnet workload install maui                         # once, for the desktop client
 dotnet run --project LMS/CLI.LMS.MAUI/CLI.LMS.MAUI -f net10.0-windows10.0.19041.0
