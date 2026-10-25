@@ -1,5 +1,8 @@
 # Learning Management System
 
+**Live API demo:** https://lms-api-cphl.onrender.com (opens Swagger UI; the first request
+after the service has been idle takes about a minute to wake it)
+
 An LMS modeled on Canvas, built with .NET 10. Instructors create courses, manage rosters,
 post assignments, and grade work. Students enroll, read course modules, and submit.
 
